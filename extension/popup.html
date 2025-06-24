@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Prompt Manager Settings</title>
+  <style>
+    body { font-family: Arial, sans-serif; width: 250px; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Prompt Manager</h2>
+  <p>Use the buttons below to open or close the side panel.</p>
+  <button id="openPanel">Open Side Panel</button>
+  <button id="closePanel">Close Side Panel</button>
+  <script>
+    document.getElementById('openPanel').addEventListener('click', () => {
+      chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+    });
+    document.getElementById('closePanel').addEventListener('click', () => {
+      chrome.sidePanel.close({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+    });
+  </script>
+</body>
+</html>
