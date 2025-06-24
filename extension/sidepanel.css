@@ -1,0 +1,9 @@
+body { font-family: Arial, sans-serif; width: 300px; padding: 10px; }
+.controls { display: flex; flex-wrap: wrap; gap: 5px; }
+.controls button { flex: 1; }
+#promptList { margin-top: 10px; }
+.card { border: 1px solid #ccc; padding: 5px; margin-bottom: 5px; }
+.card-title { font-weight: bold; }
+.card-tags { font-size: 0.8em; color: #555; }
+.hidden { display: none; }
+.actions { margin-top: 5px; display: flex; gap: 5px; }
