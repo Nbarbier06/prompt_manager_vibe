@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Prompt Manager</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search prompts" />
+    <button id="addPromptBtn">Add Prompt</button>
+    <button id="importBtn">Import CSV</button>
+    <button id="exportBtn">Export CSV</button>
+  </div>
+  <div id="promptList"></div>
+
+  <div id="promptFormContainer" class="hidden">
+    <h2 id="formTitle">Add Prompt</h2>
+    <form id="promptForm">
+      <input type="hidden" id="promptId" />
+      <label>Title<input type="text" id="title" required></label>
+      <label>Content<textarea id="content" required></textarea></label>
+      <label>Folder<input type="text" id="folder"></label>
+      <label>Tags (comma separated)<input type="text" id="tags"></label>
+      <label><input type="checkbox" id="favorite"> Favorite</label>
+      <div class="actions">
+        <button type="submit" id="saveBtn">Save</button>
+        <button type="button" id="cancelBtn">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <input type="file" id="fileInput" accept=".csv" class="hidden"/>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>
