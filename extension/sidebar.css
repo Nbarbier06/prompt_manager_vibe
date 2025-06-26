@@ -1,0 +1,48 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#search-container {
+  margin-bottom: 10px;
+}
+#search {
+  width: 100%;
+  padding: 5px;
+}
+#folders {
+  margin-bottom: 10px;
+}
+#folder-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.folder {
+  text-align: center;
+  width: 60px;
+}
+.folder span {
+  display: block;
+}
+#prompts {
+  overflow-y: auto;
+  max-height: calc(100vh - 180px);
+}
+.prompt-card {
+  border: 1px solid #ccc;
+  margin-bottom: 8px;
+  padding: 5px;
+  border-radius: 4px;
+}
+.card-title {
+  font-weight: bold;
+}
+.card-actions button {
+  margin-right: 5px;
+}
+#settings {
+  margin-top: 10px;
+}

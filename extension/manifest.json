@@ -1,0 +1,25 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT Prompt Manager",
+  "description": "Manage and insert saved ChatGPT prompts from a sidebar.",
+  "version": "1.0.0",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["https://chatgpt.com/*"],
+  "action": {
+    "default_title": "Prompt Manager"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://chatgpt.com/*"],
+      "js": ["content_script.js"],
+      "css": ["content_script.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["sidebar.html", "sidebar.css", "sidebar.js"],
+      "matches": ["https://chatgpt.com/*"]
+    }
+  ]
+}
