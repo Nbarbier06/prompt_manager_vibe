@@ -72,6 +72,12 @@
   text-align: center;
   cursor: pointer;
   color: #f1f1f1;
+  border: 1px solid #555;
+  border-radius: 4px;
+  padding: 4px;
+}
+.pm-folder div:first-child {
+  font-size: 20px;
 }
 .pm-folder img {
   width: 24px;
@@ -118,4 +124,56 @@
   cursor: pointer;
   border-top: 1px solid #555;
   color: #fff;
+}
+
+/* Modal styles */
+.pm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.pm-modal {
+  background: #37474f;
+  padding: 10px;
+  border-radius: 8px;
+  color: #fff;
+  width: 260px;
+}
+
+.pm-modal input,
+.pm-modal textarea {
+  width: 100%;
+  padding: 4px;
+  margin-bottom: 8px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #263238;
+  color: #fff;
+}
+
+.pm-folder-select label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.pm-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 6px;
+}
+.pm-modal-actions button {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #455a64;
+  color: #fff;
+  cursor: pointer;
 }
