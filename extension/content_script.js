@@ -1,6 +1,5 @@
 (function() {
-  // Create toggle button
-  const toggleBtn = document.createElement('button');
+  const toggleBtn = document.createElement('div');
   toggleBtn.id = 'pm-toggle-btn';
   toggleBtn.textContent = 'Prompts';
   toggleBtn.setAttribute('aria-label', 'Toggle prompt manager sidebar');
@@ -18,7 +17,6 @@
       : '0';
   }
 
-  // Create sidebar
   const sidebar = document.createElement('div');
   sidebar.id = 'pm-sidebar';
   sidebar.setAttribute('role', 'complementary');
@@ -65,73 +63,12 @@
     overlay.className = 'pm-modal-overlay';
     overlay.innerHTML = `<div class="pm-modal">${content}</div>`;
     document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.remove();
+    });
     return overlay;
   }
 
-  function folderForm(data = {}) {
-    return new Promise(resolve => {
-      const overlay = openModal(`
-        <h3>${data.id ? 'Edit Folder' : 'New Folder'}</h3>
-        <input id="pm-f-name" placeholder="Name" value="${data.name || ''}" />
-        <input id="pm-f-desc" placeholder="Description" value="${data.description || ''}" />
-        <input id="pm-f-icon" placeholder="Icon" value="${data.icon || ''}" />
-        <div class="pm-modal-actions">
-          <button id="pm-f-cancel">Cancel</button>
-          <button id="pm-f-save">Save</button>
-        </div>`);
-      overlay.querySelector('#pm-f-cancel').addEventListener('click', () => {
-        overlay.remove();
-        resolve(null);
-      });
-      overlay.querySelector('#pm-f-save').addEventListener('click', () => {
-        const name = overlay.querySelector('#pm-f-name').value.trim();
-        if (!name) return alert('Name required');
-        const description = overlay.querySelector('#pm-f-desc').value.trim();
-        const icon = overlay.querySelector('#pm-f-icon').value.trim();
-        overlay.remove();
-        resolve({ name, description, icon });
-      });
-    });
-  }
-
-  function promptForm(data = {}) {
-    return new Promise(resolve => {
-      const foldersHtml = current.folders.map(f => {
-        const checked = (data.folderIds || []).includes(f.id) ? 'checked' : '';
-        return `<label><input type="checkbox" value="${f.id}" ${checked}/> ${f.name}</label>`;
-      }).join('');
-      const overlay = openModal(`
-        <h3>${data.id ? 'Edit Prompt' : 'New Prompt'}</h3>
-        <input id="pm-p-name" placeholder="Name" value="${data.name || ''}" />
-        <textarea id="pm-p-text" placeholder="Text">${data.text || ''}</textarea>
-        <input id="pm-p-desc" placeholder="Description" value="${data.description || ''}" />
-        <input id="pm-p-tags" placeholder="Tags" value="${(data.tags || []).join(', ')}" />
-        <div class="pm-folder-select">${foldersHtml}</div>
-        <div class="pm-modal-actions">
-          <button id="pm-p-cancel">Cancel</button>
-          <button id="pm-p-save">Save</button>
-        </div>`);
-      overlay.querySelector('#pm-p-cancel').addEventListener('click', () => {
-        overlay.remove();
-        resolve(null);
-      });
-      overlay.querySelector('#pm-p-save').addEventListener('click', () => {
-        const name = overlay.querySelector('#pm-p-name').value.trim();
-        const text = overlay.querySelector('#pm-p-text').value.trim();
-        if (!name || !text) return alert('Name and text required');
-        const description = overlay.querySelector('#pm-p-desc').value.trim();
-        const tags = overlay.querySelector('#pm-p-tags').value
-          .split(',')
-          .map(t => t.trim())
-          .filter(Boolean);
-        const folderIds = Array.from(overlay.querySelectorAll('.pm-folder-select input:checked')).map(i => i.value);
-        overlay.remove();
-        resolve({ name, text, description, tags, folderIds });
-      });
-    });
-  }
-
-  // Utilities
   function loadData() {
     return new Promise(resolve => {
       chrome.storage.local.get(['folders', 'prompts'], data => {
@@ -157,15 +94,10 @@
     folders.slice(0,4).forEach(f => {
       const div = document.createElement('div');
       div.className = 'pm-folder';
-      div.innerHTML = `<div>${f.icon || '📁'}</div><div>${f.name}</div>`;
-      div.addEventListener('click', async () => {
-        const res = await folderForm(f);
-        if (!res) return;
-        f.name = res.name;
-        f.description = res.description;
-        f.icon = res.icon;
-        saveCurrent();
-      });
+      div.innerHTML = `
+        <div>${f.icon || '📁'}</div>
+        <div>${f.name}</div>`;
+      div.addEventListener('click', () => openFolderForm(f));
       container.appendChild(div);
     });
     if (folders.length > 4) {
@@ -194,22 +126,16 @@
         <div class="pm-card-body">${(p.description || p.text).substring(0, 60)}...</div>
       `;
       card.addEventListener('click', e => {
-        if (e.target.tagName === 'BUTTON') return; // ignore button clicks
+        if (e.target.tagName === 'BUTTON') return;
         insertPrompt(p.text);
       });
       card.querySelector('[data-action="fav"]').addEventListener('click', () => {
         p.favorite = !p.favorite;
         saveCurrent();
       });
-      card.querySelector('[data-action="edit"]').addEventListener('click', async () => {
-        const res = await promptForm(p);
-        if (!res) return;
-        p.name = res.name;
-        p.description = res.description;
-        p.text = res.text;
-        p.tags = res.tags;
-        p.folderIds = res.folderIds;
-        saveCurrent();
+      card.querySelector('[data-action="edit"]').addEventListener('click', () => {
+        openPromptForm(p);
+
       });
       card.querySelector('[data-action="del"]').addEventListener('click', () => {
         current.prompts = current.prompts.filter(x => x.id !== p.id);
@@ -237,8 +163,90 @@
   function render() {
     renderFolders(current.folders);
     const term = document.getElementById('pm-search').value.toLowerCase();
-    const filtered = current.prompts.filter(p => p.name.toLowerCase().includes(term) || p.text.toLowerCase().includes(term));
+    const filtered = current.prompts.filter(p =>
+      p.name.toLowerCase().includes(term) || p.text.toLowerCase().includes(term)
+    );
     renderPrompts(filtered);
+  }
+
+  function openFolderForm(folder) {
+    const f = folder || { icon: '📁' };
+    const overlay = openModal(`
+      <form id="pm-folder-form">
+        <h3>${folder ? 'Edit' : 'New'} Folder</h3>
+        <input type="text" id="pm-folder-name" placeholder="Name" value="${f.name || ''}" required />
+        <input type="text" id="pm-folder-desc" placeholder="Description" value="${f.description || ''}" />
+        <input type="text" id="pm-folder-icon" placeholder="Icon" value="${f.icon || '📁'}" />
+        <button type="submit">Save</button>
+        <button type="button" id="pm-cancel-folder">Cancel</button>
+      </form>
+    `);
+    overlay.querySelector('#pm-cancel-folder').onclick = () => overlay.remove();
+    overlay.querySelector('#pm-folder-form').onsubmit = e => {
+      e.preventDefault();
+      const name = overlay.querySelector('#pm-folder-name').value.trim();
+      if (!name) return;
+      const desc = overlay.querySelector('#pm-folder-desc').value.trim();
+      const icon = overlay.querySelector('#pm-folder-icon').value.trim() || '📁';
+      if (folder) {
+        folder.name = name;
+        folder.description = desc;
+        folder.icon = icon;
+      } else {
+        const id = Date.now().toString();
+        current.folders.push({ id, name, description: desc, icon });
+      }
+      saveCurrent();
+      overlay.remove();
+    };
+  }
+
+  function openPromptForm(prompt) {
+    const p = prompt || { folderIds: [] };
+    const foldersHtml = current.folders
+      .map(
+        f => `<label><input type="checkbox" class="pm-folder-choice" value="${f.id}" ${p.folderIds && p.folderIds.includes(f.id) ? 'checked' : ''}/> ${f.name}</label>`
+      )
+      .join('<br/>');
+    const overlay = openModal(`
+      <form id="pm-prompt-form">
+        <h3>${prompt ? 'Edit' : 'New'} Prompt</h3>
+        <input type="text" id="pm-prompt-name" placeholder="Name" value="${p.name || ''}" required />
+        <textarea id="pm-prompt-desc" placeholder="Description">${p.description || ''}</textarea>
+        <textarea id="pm-prompt-text" placeholder="Text" required>${p.text || ''}</textarea>
+        <input type="text" id="pm-prompt-tags" placeholder="Tags" value="${(p.tags || []).join(',')}" />
+        <div style="margin-bottom:8px;">${foldersHtml}</div>
+        <button type="submit">Save</button>
+        <button type="button" id="pm-cancel-prompt">Cancel</button>
+      </form>
+    `);
+    overlay.querySelector('#pm-cancel-prompt').onclick = () => overlay.remove();
+    overlay.querySelector('#pm-prompt-form').onsubmit = e => {
+      e.preventDefault();
+      const name = overlay.querySelector('#pm-prompt-name').value.trim();
+      if (!name) return;
+      const desc = overlay.querySelector('#pm-prompt-desc').value.trim();
+      const text = overlay.querySelector('#pm-prompt-text').value.trim();
+      if (!text) return;
+      const tags = overlay
+        .querySelector('#pm-prompt-tags')
+        .value.split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+      const folderIds = Array.from(overlay.querySelectorAll('.pm-folder-choice:checked')).map(el => el.value);
+      if (prompt) {
+        prompt.name = name;
+        prompt.description = desc;
+        prompt.text = text;
+        prompt.tags = tags;
+        prompt.folderIds = folderIds;
+      } else {
+        const id = Date.now().toString();
+        current.prompts.push({ id, name, description: desc, text, tags, folderIds, favorite: false });
+      }
+      saveCurrent();
+      overlay.remove();
+    };
   }
 
   loadData().then(data => {
@@ -270,7 +278,7 @@
             const data = JSON.parse(reader.result);
             current = data;
             saveCurrent();
-          } catch(err) {
+          } catch (err) {
             alert('Invalid file');
           }
         };
@@ -280,27 +288,6 @@
     }
   });
 
-  document.getElementById('pm-new-folder').addEventListener('click', async () => {
-    const res = await folderForm();
-    if (!res) return;
-    const id = Date.now().toString();
-    current.folders.push({ id, name: res.name, description: res.description, icon: res.icon });
-    saveCurrent();
-  });
-
-  document.getElementById('pm-new-prompt').addEventListener('click', async () => {
-    const res = await promptForm();
-    if (!res) return;
-    const id = Date.now().toString();
-    current.prompts.push({
-      id,
-      name: res.name,
-      description: res.description,
-      text: res.text,
-      tags: res.tags,
-      folderIds: res.folderIds,
-      favorite: false
-    });
-    saveCurrent();
-  });
+  document.getElementById('pm-new-folder').addEventListener('click', () => openFolderForm());
+  document.getElementById('pm-new-prompt').addEventListener('click', () => openPromptForm());
 })();

@@ -85,16 +85,15 @@
   text-align: center;
   cursor: pointer;
   color: #f1f1f1;
+  padding: 4px;
   border: 1px solid #555;
   border-radius: 4px;
-  padding: 4px;
-}
-.pm-folder div:first-child {
-  font-size: 20px;
 }
 .pm-folder img {
   width: 24px;
   height: 24px;
+  display: block;
+  margin: 0 auto 4px;
 }
 
 .pm-prompt-list {
@@ -144,9 +143,9 @@
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,38 +154,32 @@
 
 .pm-modal {
   background: #37474f;
-  padding: 10px;
-  border-radius: 8px;
   color: #fff;
-  width: 260px;
+  padding: 20px;
+  border-radius: 8px;
+  width: 50vw;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.pm-modal input,
+.pm-modal input[type="text"],
 .pm-modal textarea {
   width: 100%;
-  padding: 4px;
   margin-bottom: 8px;
-  border-radius: 4px;
+  padding: 4px;
+  background: #455a64;
   border: 1px solid #555;
-  background: #263238;
   color: #fff;
+  border-radius: 4px;
 }
 
-.pm-folder-select label {
-  display: block;
-  margin-bottom: 4px;
-}
-
-.pm-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 6px;
-}
-.pm-modal-actions button {
+.pm-modal button {
+  margin-right: 4px;
   padding: 4px 8px;
   border-radius: 4px;
   border: 1px solid #555;
-  background: #455a64;
+  background: #10a37f;
   color: #fff;
   cursor: pointer;
 }
