@@ -1,0 +1,84 @@
+/* Sidebar styles */
+#pm-toggle-btn {
+  position: fixed;
+  top: 50%;
+  right: 0;
+  background: #10a37f;
+  color: white;
+  padding: 8px;
+  border-radius: 4px 0 0 4px;
+  cursor: pointer;
+  z-index: 10000;
+  font-family: sans-serif;
+}
+
+#pm-sidebar {
+  position: fixed;
+  top: 0;
+  right: -320px;
+  width: 300px;
+  height: 100vh;
+  background: #f1f1f1;
+  box-shadow: -2px 0 5px rgba(0,0,0,0.2);
+  padding: 10px;
+  overflow-y: auto;
+  z-index: 9999;
+  transition: right 0.3s ease;
+  font-family: sans-serif;
+}
+#pm-sidebar.open { right: 0; }
+
+.pm-search {
+  width: 100%;
+  padding: 6px;
+  margin-bottom: 10px;
+}
+
+.pm-folder-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.pm-folder {
+  width: 60px;
+  text-align: center;
+  cursor: pointer;
+}
+.pm-folder img {
+  width: 24px;
+  height: 24px;
+}
+
+.pm-prompt-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pm-card {
+  background: white;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.pm-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.pm-card-actions button {
+  margin-left: 4px;
+}
+
+#pm-settings-btn {
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  padding: 6px;
+  background: #eee;
+  text-align: center;
+  cursor: pointer;
+  border-top: 1px solid #ccc;
+}
