@@ -22,6 +22,11 @@
 
   toggleBtn.addEventListener('click', () => {
     sidebar.classList.toggle('open');
+    if (sidebar.classList.contains('open')) {
+      toggleBtn.style.right = '320px';
+    } else {
+      toggleBtn.style.right = '0';
+    }
   });
 
   // Utilities
