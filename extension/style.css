@@ -144,7 +144,10 @@
   color: #fff;
   padding: 20px;
   border-radius: 8px;
-  width: 260px;
+  width: 50vw;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .pm-modal input[type="text"],
