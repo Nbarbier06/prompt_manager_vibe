@@ -18,4 +18,4 @@ The prompts are organised as cards with buttons on it to modify, add/remove from
 2. Enable **Developer mode**.
 3. Click **Load unpacked** and select the `extension` folder of this repository.
 
-After loading the extension you will see a new action icon. Clicking it opens a small settings popup. Use the **Open Side Panel** button there to show the prompt manager or close it when you are done. In the sidebar you can add new entries using the form, filter them with the search bar and edit each prompt from its card. Your library is stored locally in Chrome.
+After loading the extension you will see a new action icon. Clicking it opens a small settings popup. Use the browser side panel to manage your prompts. In the sidebar you can add new entries using the form, filter them with the search bar and edit each prompt from its card. Your library is stored locally in Chrome.
