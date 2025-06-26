@@ -12,13 +12,6 @@
   <p>Use the buttons below to open or close the side panel.</p>
   <button id="openPanel">Open Side Panel</button>
   <button id="closePanel">Close Side Panel</button>
-  <script>
-    document.getElementById('openPanel').addEventListener('click', () => {
-      chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-    });
-    document.getElementById('closePanel').addEventListener('click', () => {
-      chrome.sidePanel.close({ windowId: chrome.windows.WINDOW_ID_CURRENT });
-    });
-  </script>
+  <script src="popup.js"></script>
 </body>
 </html>
