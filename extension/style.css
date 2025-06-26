@@ -32,6 +32,18 @@
 }
 #pm-sidebar.open { right: 0; }
 
+.pm-header {
+  position: sticky;
+  top: 0;
+  background: #263238;
+  padding: 8px 0;
+  text-align: center;
+  font-size: 1.1em;
+  font-weight: 600;
+  border-bottom: 1px solid #555;
+  z-index: 1;
+}
+
 .pm-search {
   width: 100%;
   padding: 6px;

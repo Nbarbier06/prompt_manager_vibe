@@ -3,6 +3,7 @@
   const toggleBtn = document.createElement('div');
   toggleBtn.id = 'pm-toggle-btn';
   toggleBtn.textContent = 'Prompts';
+  toggleBtn.setAttribute('aria-label', 'Toggle Prompt Manager');
   document.body.appendChild(toggleBtn);
 
   const SIDEBAR_WIDTH = 300;
@@ -16,7 +17,11 @@
   // Create sidebar
   const sidebar = document.createElement('div');
   sidebar.id = 'pm-sidebar';
+  sidebar.setAttribute('role', 'complementary');
   sidebar.innerHTML = `
+    <header class="pm-header">
+      <h2>Prompt Manager</h2>
+    </header>
     <input type="text" placeholder="Search" class="pm-search" id="pm-search" />
     <div class="pm-actions">
       <button id="pm-new-folder">New Folder</button>
