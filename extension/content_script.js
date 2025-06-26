@@ -5,6 +5,14 @@
   toggleBtn.textContent = 'Prompts';
   document.body.appendChild(toggleBtn);
 
+  const SIDEBAR_WIDTH = 300;
+
+  function updateTogglePosition() {
+    toggleBtn.style.right = sidebar.classList.contains('open')
+      ? `${SIDEBAR_WIDTH}px`
+      : '0';
+  }
+
   // Create sidebar
   const sidebar = document.createElement('div');
   sidebar.id = 'pm-sidebar';
@@ -19,9 +27,11 @@
     <div id="pm-settings-btn">Settings</div>
   `;
   document.body.appendChild(sidebar);
+  updateTogglePosition();
 
   toggleBtn.addEventListener('click', () => {
     sidebar.classList.toggle('open');
+    updateTogglePosition();
   });
 
   // Utilities

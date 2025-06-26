@@ -10,6 +10,9 @@
   cursor: pointer;
   z-index: 10000;
   font-family: sans-serif;
+  transform: rotate(-90deg);
+  transform-origin: center;
+  transition: right 0.3s ease;
 }
 
 #pm-sidebar {
@@ -32,7 +35,7 @@
 .pm-search {
   width: 100%;
   padding: 6px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   border: 1px solid #555;
   border-radius: 4px;
   background: #37474f;
@@ -42,7 +45,7 @@
 .pm-actions {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .pm-actions button {
@@ -60,8 +63,8 @@
 .pm-folder-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 10px;
+  gap: 8px;
+  margin-bottom: 14px;
 }
 
 .pm-folder {
@@ -78,15 +81,16 @@
 .pm-prompt-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
 .pm-card {
   background: #fff;
   color: #000;
-  padding: 6px;
+  padding: 10px;
   border: 1px solid #ccc;
-  border-radius: 4px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 .pm-card-header {
   display: flex;
@@ -98,6 +102,10 @@
   background: transparent;
   border: none;
   cursor: pointer;
+}
+
+.pm-card-body {
+  margin-top: 6px;
 }
 
 #pm-settings-btn {
