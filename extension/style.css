@@ -10,9 +10,15 @@
   cursor: pointer;
   z-index: 10000;
   font-family: sans-serif;
+  border: none;
   transform: rotate(-90deg);
   transform-origin: center;
   transition: right 0.3s ease;
+  outline: none;
+}
+
+#pm-toggle-btn:focus {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #10a37f;
 }
 
 #pm-sidebar {
@@ -31,6 +37,13 @@
   font-family: sans-serif;
 }
 #pm-sidebar.open { right: 0; }
+
+.pm-header {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.2em;
+  margin-bottom: 10px;
+}
 
 .pm-search {
   width: 100%;

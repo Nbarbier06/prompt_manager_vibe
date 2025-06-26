@@ -13,6 +13,8 @@ ChatGPT Prompt Manager is a Chrome extension that lets you store your favorite p
 - Add tags to prompts to ease their search
 - Button on the right side of chatGPT.com to open/close the prompt manager sidebar
 - Dark themed sidebar for better readability
+- Sidebar header and keyboard-accessible toggle for improved navigation
+- Search input with accessible label and Escape key to close the sidebar
 
 The prompts are organised as cards with buttons to modify, add/remove from favorites, delete and paste to the ChatGPT textbox.
 

@@ -1,8 +1,13 @@
 (function() {
   // Create toggle button
-  const toggleBtn = document.createElement('div');
+  const toggleBtn = document.createElement('button');
   toggleBtn.id = 'pm-toggle-btn';
   toggleBtn.textContent = 'Prompts';
+  toggleBtn.setAttribute('aria-label', 'Toggle prompt manager sidebar');
+  toggleBtn.setAttribute('aria-controls', 'pm-sidebar');
+  toggleBtn.setAttribute('title', 'Toggle prompt manager sidebar');
+  toggleBtn.setAttribute('tabindex', '0');
+  toggleBtn.setAttribute('aria-expanded', 'false');
   document.body.appendChild(toggleBtn);
 
   const SIDEBAR_WIDTH = 300;
@@ -16,8 +21,10 @@
   // Create sidebar
   const sidebar = document.createElement('div');
   sidebar.id = 'pm-sidebar';
+  sidebar.setAttribute('role', 'complementary');
   sidebar.innerHTML = `
-    <input type="text" placeholder="Search" class="pm-search" id="pm-search" />
+    <div class="pm-header"><h1>Prompt Manager</h1></div>
+    <input type="text" placeholder="Search" aria-label="Search prompts" class="pm-search" id="pm-search" />
     <div class="pm-actions">
       <button id="pm-new-folder">New Folder</button>
       <button id="pm-new-prompt">New Prompt</button>
@@ -29,9 +36,28 @@
   document.body.appendChild(sidebar);
   updateTogglePosition();
 
-  toggleBtn.addEventListener('click', () => {
+  function toggleSidebar() {
     sidebar.classList.toggle('open');
+    const expanded = sidebar.classList.contains('open');
+    toggleBtn.setAttribute('aria-expanded', expanded.toString());
     updateTogglePosition();
+    if (!expanded) {
+      toggleBtn.focus();
+    }
+  }
+
+  toggleBtn.addEventListener('click', toggleSidebar);
+  toggleBtn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleSidebar();
+    }
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && sidebar.classList.contains('open')) {
+      toggleSidebar();
+    }
   });
 
   // Utilities
