@@ -59,18 +59,40 @@
   });
 
   let current = { folders: [], prompts: [] };
+  let selectedFolders = [];
 
   function saveCurrent() {
     StorageService.saveData(current.folders, current.prompts);
     render();
   }
 
+  function toggleFolder(id) {
+    const idx = selectedFolders.indexOf(id);
+    if (idx > -1) {
+      selectedFolders.splice(idx, 1);
+    } else {
+      selectedFolders.push(id);
+    }
+    render();
+  }
+
   function render() {
-    FolderService.renderFolders(current.folders, current, saveCurrent);
-    const term = document.getElementById('pm-search').value.toLowerCase();
-    const filtered = current.prompts.filter(p =>
-      p.name.toLowerCase().includes(term) || p.text.toLowerCase().includes(term)
+    FolderService.renderFolders(
+      current.folders,
+      current,
+      saveCurrent,
+      selectedFolders,
+      toggleFolder
     );
+    const term = document.getElementById('pm-search').value.toLowerCase();
+    const filtered = current.prompts.filter(p => {
+      const matchTerm =
+        p.name.toLowerCase().includes(term) || p.text.toLowerCase().includes(term);
+      const inFolder =
+        selectedFolders.length === 0 ||
+        selectedFolders.some(fid => (p.folderIds || []).includes(fid));
+      return matchTerm && inFolder;
+    });
     PromptService.renderPrompts(filtered, current, saveCurrent);
   }
 
