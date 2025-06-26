@@ -63,6 +63,8 @@
   width: 100%;
   padding: 6px;
   margin-bottom: 16px;
+  border-bottom: 1px solid #555;
+  padding-bottom: 8px;
   border: 1px solid #555;
   border-radius: 4px;
   background: #37474f;
@@ -73,6 +75,8 @@
   display: flex;
   justify-content: space-between;
   margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #555;
 }
 
 .pm-actions button {

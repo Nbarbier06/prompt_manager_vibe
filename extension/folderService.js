@@ -1,4 +1,5 @@
 (function() {
+<<<<<<< dmwoab-codex/séparer-la-sidebar-et-ajouter-filtres
   function renderFolders(
     folders,
     current,
@@ -15,15 +16,35 @@
       const div = document.createElement('div');
       div.className = 'pm-folder';
       if (selectedIds.has(f.id)) div.classList.add('selected');
+=======
+  function renderFolders(folders, current, saveCurrent, selectedIds, toggle) {
+    const container = document.getElementById('pm-folders');
+    container.innerHTML = '';
+    folders.forEach(f => {
+      const div = document.createElement('div');
+      div.className = 'pm-folder';
+      if (selectedIds && selectedIds.includes(f.id)) div.classList.add('selected');
+>>>>>>> main
       div.innerHTML = `
         <div>${f.icon || '📁'}</div>
         <div>${f.name}</div>
         <button class="pm-folder-edit" title="Edit">✎</button>`;
+<<<<<<< dmwoab-codex/séparer-la-sidebar-et-ajouter-filtres
       div.querySelector('.pm-folder-edit').addEventListener('click', e => {
         e.stopPropagation();
         onEdit(f);
       });
       div.addEventListener('click', () => onToggle(f.id));
+=======
+      div.addEventListener('click', e => {
+        if (e.target.classList.contains('pm-folder-edit')) return;
+        toggle && toggle(f.id);
+      });
+      div.querySelector('.pm-folder-edit').addEventListener('click', e => {
+        e.stopPropagation();
+        openFolderForm(f, current, saveCurrent);
+      });
+>>>>>>> main
       container.appendChild(div);
     });
   }
