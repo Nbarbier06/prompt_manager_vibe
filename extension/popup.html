@@ -9,6 +9,16 @@
 </head>
 <body>
   <h2>Prompt Manager</h2>
-  <p>Open the side panel to manage your prompts.</p>
+  <p>Use the buttons below to open or close the side panel.</p>
+  <button id="openPanel">Open Side Panel</button>
+  <button id="closePanel">Close Side Panel</button>
+  <script>
+    document.getElementById('openPanel').addEventListener('click', () => {
+      chrome.sidePanel.open({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+    });
+    document.getElementById('closePanel').addEventListener('click', () => {
+      chrome.sidePanel.close({ windowId: chrome.windows.WINDOW_ID_CURRENT });
+    });
+  </script>
 </body>
 </html>
