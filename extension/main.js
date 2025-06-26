@@ -19,7 +19,10 @@
   sidebar.id = 'pm-sidebar';
   sidebar.setAttribute('role', 'complementary');
   sidebar.innerHTML = `
-    <div class="pm-header"><h1>Prompt Manager</h1></div>
+    <div class="pm-header">
+      <h1>Prompt Manager</h1>
+      <button id="pm-settings-icon" title="Settings" aria-label="Settings">⚙️</button>
+    </div>
     <input type="text" placeholder="Search" aria-label="Search prompts" class="pm-search" id="pm-search" />
     <div class="pm-actions">
       <button id="pm-new-folder">New Folder</button>
@@ -27,7 +30,6 @@
     </div>
     <div class="pm-folder-list" id="pm-folders"></div>
     <div class="pm-prompt-list" id="pm-prompts"></div>
-    <div id="pm-settings-btn">Settings</div>
   `;
   document.body.appendChild(sidebar);
   updateTogglePosition();
@@ -87,7 +89,7 @@
 
   document.getElementById('pm-search').addEventListener('input', render);
 
-  document.getElementById('pm-settings-btn').addEventListener('click', () => {
+  document.getElementById('pm-settings-icon').addEventListener('click', () => {
     if (confirm('Export prompts to JSON?')) {
       const blob = new Blob([JSON.stringify(current)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);

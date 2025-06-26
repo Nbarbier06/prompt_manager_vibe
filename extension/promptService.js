@@ -51,10 +51,14 @@
     const overlay = UiService.openModal(`
       <form id="pm-prompt-form">
         <h3>${prompt ? 'Edit' : 'New'} Prompt</h3>
-        <input type="text" id="pm-prompt-name" placeholder="Name" value="${p.name || ''}" required />
-        <textarea id="pm-prompt-desc" placeholder="Description">${p.description || ''}</textarea>
-        <textarea id="pm-prompt-text" placeholder="Text" required>${p.text || ''}</textarea>
-        <input type="text" id="pm-prompt-tags" placeholder="Tags" value="${(p.tags || []).join(',')}" />
+        <label for="pm-prompt-name">Name</label>
+        <input type="text" id="pm-prompt-name" value="${p.name || ''}" required />
+        <label for="pm-prompt-desc">Description</label>
+        <textarea id="pm-prompt-desc">${p.description || ''}</textarea>
+        <label for="pm-prompt-text">Text</label>
+        <textarea id="pm-prompt-text" required>${p.text || ''}</textarea>
+        <label for="pm-prompt-tags">Tags</label>
+        <input type="text" id="pm-prompt-tags" value="${(p.tags || []).join(',')}" />
         <div style="margin-bottom:8px;">${foldersHtml}</div>
         <button type="submit">Save</button>
         <button type="button" id="pm-cancel-prompt">Cancel</button>

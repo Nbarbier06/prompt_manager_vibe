@@ -39,16 +39,33 @@
 #pm-sidebar.open { right: 0; }
 
 .pm-header {
-  text-align: center;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-weight: 600;
   font-size: 1.2em;
-  margin-bottom: 10px;
+  margin-bottom: 16px;
+}
+.pm-header h1 {
+  margin: 0;
+  flex: 1;
+  text-align: center;
+}
+#pm-settings-icon {
+  position: absolute;
+  right: 0;
+  background: transparent;
+  border: none;
+  color: #f1f1f1;
+  cursor: pointer;
+  font-size: 1em;
 }
 
 .pm-search {
   width: 100%;
   padding: 6px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   border: 1px solid #555;
   border-radius: 4px;
   background: #37474f;
@@ -58,7 +75,7 @@
 .pm-actions {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .pm-actions button {
@@ -77,7 +94,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 20px;
 }
 
 .pm-folder {
@@ -99,7 +116,7 @@
 .pm-prompt-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
 }
 
 .pm-card {
@@ -126,17 +143,6 @@
   margin-top: 6px;
 }
 
-#pm-settings-btn {
-  position: sticky;
-  bottom: 0;
-  width: 100%;
-  padding: 6px;
-  background: #37474f;
-  text-align: center;
-  cursor: pointer;
-  border-top: 1px solid #555;
-  color: #fff;
-}
 
 /* Modal styles */
 .pm-modal-overlay {
@@ -166,12 +172,18 @@
 .pm-modal input[type="text"],
 .pm-modal textarea {
   width: 100%;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   padding: 4px;
   background: #455a64;
   border: 1px solid #555;
   color: #fff;
   border-radius: 4px;
+}
+
+.pm-modal label {
+  margin-top: 8px;
+  margin-bottom: 4px;
+  display: block;
 }
 
 .pm-modal button {
