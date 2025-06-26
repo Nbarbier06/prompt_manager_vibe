@@ -34,7 +34,7 @@
       <div class="pm-folder-list" id="pm-folders"></div>
       <div class="pm-folder-toggle" id="pm-folder-toggle" tabindex="0" aria-label="More folders">▼</div>
     </div>
-    <div class="pm-section">
+    <div class="pm-section pm-prompts-section">
       <div class="pm-prompt-list" id="pm-prompts"></div>
     </div>
   `;
