@@ -24,11 +24,22 @@
     const overlay = UiService.openModal(`
       <form id="pm-folder-form">
         <h3>${folder ? 'Edit' : 'New'} Folder</h3>
-        <input type="text" id="pm-folder-name" placeholder="Name" value="${f.name || ''}" required />
-        <input type="text" id="pm-folder-desc" placeholder="Description" value="${f.description || ''}" />
-        <input type="text" id="pm-folder-icon" placeholder="Icon" value="${f.icon || '📁'}" />
-        <button type="submit">Save</button>
-        <button type="button" id="pm-cancel-folder">Cancel</button>
+        <div class="pm-form-group">
+          <label for="pm-folder-name">Name</label>
+          <input type="text" id="pm-folder-name" value="${f.name || ''}" required />
+        </div>
+        <div class="pm-form-group">
+          <label for="pm-folder-desc">Description</label>
+          <input type="text" id="pm-folder-desc" value="${f.description || ''}" />
+        </div>
+        <div class="pm-form-group">
+          <label for="pm-folder-icon">Icon</label>
+          <input type="text" id="pm-folder-icon" value="${f.icon || '📁'}" />
+        </div>
+        <div class="pm-form-actions">
+          <button type="submit">Save</button>
+          <button type="button" id="pm-cancel-folder">Cancel</button>
+        </div>
       </form>
     `);
     overlay.querySelector('#pm-cancel-folder').onclick = () => overlay.remove();
