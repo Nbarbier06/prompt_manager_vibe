@@ -1,5 +1,4 @@
 (function() {
-  // Create toggle button
   const toggleBtn = document.createElement('div');
   toggleBtn.id = 'pm-toggle-btn';
   toggleBtn.textContent = 'Prompts';
@@ -13,7 +12,6 @@
       : '0';
   }
 
-  // Create sidebar
   const sidebar = document.createElement('div');
   sidebar.id = 'pm-sidebar';
   sidebar.innerHTML = `
@@ -34,7 +32,17 @@
     updateTogglePosition();
   });
 
-  // Utilities
+  function openModal(content) {
+    const overlay = document.createElement('div');
+    overlay.className = 'pm-modal-overlay';
+    overlay.innerHTML = `<div class="pm-modal">${content}</div>`;
+    document.body.appendChild(overlay);
+    overlay.addEventListener('click', e => {
+      if (e.target === overlay) overlay.remove();
+    });
+    return overlay;
+  }
+
   function loadData() {
     return new Promise(resolve => {
       chrome.storage.local.get(['folders', 'prompts'], data => {
@@ -56,7 +64,10 @@
     folders.slice(0,4).forEach(f => {
       const div = document.createElement('div');
       div.className = 'pm-folder';
-      div.textContent = f.name;
+      div.innerHTML = `
+        <div>${f.icon || '📁'}</div>
+        <div>${f.name}</div>`;
+      div.addEventListener('click', () => openFolderForm(f));
       container.appendChild(div);
     });
     if (folders.length > 4) {
@@ -85,7 +96,7 @@
         <div class="pm-card-body">${(p.description || p.text).substring(0, 60)}...</div>
       `;
       card.addEventListener('click', e => {
-        if (e.target.tagName === 'BUTTON') return; // ignore button clicks
+        if (e.target.tagName === 'BUTTON') return;
         insertPrompt(p.text);
       });
       card.querySelector('[data-action="fav"]').addEventListener('click', () => {
@@ -93,19 +104,7 @@
         saveCurrent();
       });
       card.querySelector('[data-action="edit"]').addEventListener('click', () => {
-        const newName = prompt('Prompt name', p.name);
-        if (!newName) return;
-        const newDesc = prompt('Prompt description', p.description || '');
-        const newText = prompt('Prompt text', p.text);
-        if (!newText) return;
-        const newTags = prompt('Tags (comma separated)', (p.tags || []).join(', ')) || '';
-        const newFolder = prompt('Folder id (leave empty for none)', p.folderId || '') || '';
-        p.name = newName;
-        p.description = newDesc || '';
-        p.text = newText;
-        p.tags = newTags.split(',').map(t => t.trim()).filter(Boolean);
-        p.folderId = newFolder;
-        saveCurrent();
+        openPromptForm(p);
       });
       card.querySelector('[data-action="del"]').addEventListener('click', () => {
         current.prompts = current.prompts.filter(x => x.id !== p.id);
@@ -133,8 +132,90 @@
   function render() {
     renderFolders(current.folders);
     const term = document.getElementById('pm-search').value.toLowerCase();
-    const filtered = current.prompts.filter(p => p.name.toLowerCase().includes(term) || p.text.toLowerCase().includes(term));
+    const filtered = current.prompts.filter(p =>
+      p.name.toLowerCase().includes(term) || p.text.toLowerCase().includes(term)
+    );
     renderPrompts(filtered);
+  }
+
+  function openFolderForm(folder) {
+    const f = folder || { icon: '📁' };
+    const overlay = openModal(`
+      <form id="pm-folder-form">
+        <h3>${folder ? 'Edit' : 'New'} Folder</h3>
+        <input type="text" id="pm-folder-name" placeholder="Name" value="${f.name || ''}" required />
+        <input type="text" id="pm-folder-desc" placeholder="Description" value="${f.description || ''}" />
+        <input type="text" id="pm-folder-icon" placeholder="Icon" value="${f.icon || '📁'}" />
+        <button type="submit">Save</button>
+        <button type="button" id="pm-cancel-folder">Cancel</button>
+      </form>
+    `);
+    overlay.querySelector('#pm-cancel-folder').onclick = () => overlay.remove();
+    overlay.querySelector('#pm-folder-form').onsubmit = e => {
+      e.preventDefault();
+      const name = overlay.querySelector('#pm-folder-name').value.trim();
+      if (!name) return;
+      const desc = overlay.querySelector('#pm-folder-desc').value.trim();
+      const icon = overlay.querySelector('#pm-folder-icon').value.trim() || '📁';
+      if (folder) {
+        folder.name = name;
+        folder.description = desc;
+        folder.icon = icon;
+      } else {
+        const id = Date.now().toString();
+        current.folders.push({ id, name, description: desc, icon });
+      }
+      saveCurrent();
+      overlay.remove();
+    };
+  }
+
+  function openPromptForm(prompt) {
+    const p = prompt || { folderIds: [] };
+    const foldersHtml = current.folders
+      .map(
+        f => `<label><input type="checkbox" class="pm-folder-choice" value="${f.id}" ${p.folderIds && p.folderIds.includes(f.id) ? 'checked' : ''}/> ${f.name}</label>`
+      )
+      .join('<br/>');
+    const overlay = openModal(`
+      <form id="pm-prompt-form">
+        <h3>${prompt ? 'Edit' : 'New'} Prompt</h3>
+        <input type="text" id="pm-prompt-name" placeholder="Name" value="${p.name || ''}" required />
+        <textarea id="pm-prompt-desc" placeholder="Description">${p.description || ''}</textarea>
+        <textarea id="pm-prompt-text" placeholder="Text" required>${p.text || ''}</textarea>
+        <input type="text" id="pm-prompt-tags" placeholder="Tags" value="${(p.tags || []).join(',')}" />
+        <div style="margin-bottom:8px;">${foldersHtml}</div>
+        <button type="submit">Save</button>
+        <button type="button" id="pm-cancel-prompt">Cancel</button>
+      </form>
+    `);
+    overlay.querySelector('#pm-cancel-prompt').onclick = () => overlay.remove();
+    overlay.querySelector('#pm-prompt-form').onsubmit = e => {
+      e.preventDefault();
+      const name = overlay.querySelector('#pm-prompt-name').value.trim();
+      if (!name) return;
+      const desc = overlay.querySelector('#pm-prompt-desc').value.trim();
+      const text = overlay.querySelector('#pm-prompt-text').value.trim();
+      if (!text) return;
+      const tags = overlay
+        .querySelector('#pm-prompt-tags')
+        .value.split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+      const folderIds = Array.from(overlay.querySelectorAll('.pm-folder-choice:checked')).map(el => el.value);
+      if (prompt) {
+        prompt.name = name;
+        prompt.description = desc;
+        prompt.text = text;
+        prompt.tags = tags;
+        prompt.folderIds = folderIds;
+      } else {
+        const id = Date.now().toString();
+        current.prompts.push({ id, name, description: desc, text, tags, folderIds, favorite: false });
+      }
+      saveCurrent();
+      overlay.remove();
+    };
   }
 
   loadData().then(data => {
@@ -166,7 +247,7 @@
             const data = JSON.parse(reader.result);
             current = data;
             saveCurrent();
-          } catch(err) {
+          } catch (err) {
             alert('Invalid file');
           }
         };
@@ -176,37 +257,6 @@
     }
   });
 
-  document.getElementById('pm-new-folder').addEventListener('click', () => {
-    const name = prompt('Folder name');
-    if (!name) return;
-    const description = prompt('Folder description') || '';
-    const id = Date.now().toString();
-    current.folders.push({ id, name, description });
-    saveCurrent();
-  });
-
-  document.getElementById('pm-new-prompt').addEventListener('click', () => {
-    const name = prompt('Prompt name');
-    if (!name) return;
-    const description = prompt('Prompt description') || '';
-    const text = prompt('Prompt text');
-    if (!text) return;
-    const tagsInput = prompt('Tags (comma separated)') || '';
-    const folderId = prompt('Folder id (leave empty for none)') || '';
-    const id = Date.now().toString();
-    const tags = tagsInput
-      .split(',')
-      .map(t => t.trim())
-      .filter(Boolean);
-    current.prompts.push({
-      id,
-      name,
-      description,
-      text,
-      tags,
-      folderId,
-      favorite: false
-    });
-    saveCurrent();
-  });
+  document.getElementById('pm-new-folder').addEventListener('click', () => openFolderForm());
+  document.getElementById('pm-new-prompt').addEventListener('click', () => openPromptForm());
 })();
