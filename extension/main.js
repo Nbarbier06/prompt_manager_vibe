@@ -23,13 +23,19 @@
       <h1>Prompt Manager</h1>
       <button id="pm-settings-btn" class="pm-settings-icon" aria-label="Settings" title="Settings">⚙</button>
     </div>
-    <input type="text" placeholder="Search" aria-label="Search prompts" class="pm-search" id="pm-search" />
-    <div class="pm-actions">
-      <button id="pm-new-folder">New Folder</button>
-      <button id="pm-new-prompt">New Prompt</button>
+    <div class="pm-section">
+      <input type="text" placeholder="Search" aria-label="Search prompts" class="pm-search" id="pm-search" />
     </div>
-    <div class="pm-folder-list" id="pm-folders"></div>
-    <div class="pm-prompt-list" id="pm-prompts"></div>
+    <div class="pm-section">
+      <div class="pm-actions">
+        <button id="pm-new-folder">New Folder</button>
+        <button id="pm-new-prompt">New Prompt</button>
+      </div>
+      <div class="pm-folder-list" id="pm-folders"></div>
+    </div>
+    <div class="pm-section">
+      <div class="pm-prompt-list" id="pm-prompts"></div>
+    </div>
   `;
   document.body.appendChild(sidebar);
   updateTogglePosition();
@@ -59,6 +65,16 @@
   });
 
   let current = { folders: [], prompts: [] };
+  const selectedFolders = new Set();
+
+  function toggleFolderSelection(id) {
+    if (selectedFolders.has(id)) {
+      selectedFolders.delete(id);
+    } else {
+      selectedFolders.add(id);
+    }
+    render();
+  }
 
   function saveCurrent() {
     StorageService.saveData(current.folders, current.prompts);
@@ -66,11 +82,25 @@
   }
 
   function render() {
-    FolderService.renderFolders(current.folders, current, saveCurrent);
-    const term = document.getElementById('pm-search').value.toLowerCase();
-    const filtered = current.prompts.filter(p =>
-      p.name.toLowerCase().includes(term) || p.text.toLowerCase().includes(term)
+    FolderService.renderFolders(
+      current.folders,
+      current,
+      saveCurrent,
+      selectedFolders,
+      toggleFolderSelection,
+      openFolderForm
     );
+    const term = document.getElementById('pm-search').value.toLowerCase();
+    let filtered = current.prompts.filter(
+      p =>
+        p.name.toLowerCase().includes(term) ||
+        p.text.toLowerCase().includes(term)
+    );
+    if (selectedFolders.size > 0) {
+      filtered = filtered.filter(p =>
+        p.folderIds && p.folderIds.some(id => selectedFolders.has(id))
+      );
+    }
     PromptService.renderPrompts(filtered, current, saveCurrent);
   }
 

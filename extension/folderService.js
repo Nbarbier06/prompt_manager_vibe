@@ -1,22 +1,29 @@
 (function() {
-  function renderFolders(folders, current, saveCurrent) {
+  function renderFolders(
+    folders,
+    current,
+    saveCurrent,
+    selectedIds,
+    onToggle,
+    onEdit
+  ) {
     const container = document.getElementById('pm-folders');
     container.innerHTML = '';
-    folders.slice(0,4).forEach(f => {
+    folders.forEach(f => {
       const div = document.createElement('div');
       div.className = 'pm-folder';
+      if (selectedIds.has(f.id)) div.classList.add('selected');
       div.innerHTML = `
         <div>${f.icon || '📁'}</div>
-        <div>${f.name}</div>`;
-      div.addEventListener('click', () => openFolderForm(f, current, saveCurrent));
+        <div>${f.name}</div>
+        <button class="pm-folder-edit" title="Edit">✎</button>`;
+      div.querySelector('.pm-folder-edit').addEventListener('click', e => {
+        e.stopPropagation();
+        onEdit(f);
+      });
+      div.addEventListener('click', () => onToggle(f.id));
       container.appendChild(div);
     });
-    if (folders.length > 4) {
-      const more = document.createElement('div');
-      more.className = 'pm-folder';
-      more.textContent = '...';
-      container.appendChild(more);
-    }
   }
 
   function openFolderForm(folder, current, saveCurrent) {
