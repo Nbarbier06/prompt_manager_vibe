@@ -34,7 +34,7 @@
       <div class="pm-folder-list" id="pm-folders"></div>
       <div class="pm-folder-toggle" id="pm-folder-toggle" tabindex="0" aria-label="More folders">▼</div>
     </div>
-    <div class="pm-section">
+    <div class="pm-section pm-prompts-section">
       <div class="pm-prompt-list" id="pm-prompts"></div>
     </div>
   `;
@@ -81,7 +81,6 @@
   });
 
   let current = { folders: [], prompts: [] };
-<<<<<<< dmwoab-codex/séparer-la-sidebar-et-ajouter-filtres
   const selectedFolders = new Set();
   let foldersCollapsed = true;
 
@@ -93,9 +92,7 @@
     }
     render();
   }
-=======
   let selectedFolders = [];
->>>>>>> main
 
   function saveCurrent() {
     StorageService.saveData(current.folders, current.prompts);
@@ -118,7 +115,6 @@
       current,
       saveCurrent,
       selectedFolders,
-<<<<<<< dmwoab-codex/séparer-la-sidebar-et-ajouter-filtres
       toggleFolderSelection,
       openFolderForm,
       foldersCollapsed
@@ -141,7 +137,6 @@
         p.folderIds && p.folderIds.some(id => selectedFolders.has(id))
       );
     }
-=======
       toggleFolder
     );
     const term = document.getElementById('pm-search').value.toLowerCase();
@@ -153,7 +148,7 @@
         selectedFolders.some(fid => (p.folderIds || []).includes(fid));
       return matchTerm && inFolder;
     });
->>>>>>> main
+
     PromptService.renderPrompts(filtered, current, saveCurrent);
   }
 
