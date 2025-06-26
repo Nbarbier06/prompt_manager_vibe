@@ -60,14 +60,89 @@
     }
   });
 
+  function openModal(content) {
+    const overlay = document.createElement('div');
+    overlay.className = 'pm-modal-overlay';
+    overlay.innerHTML = `<div class="pm-modal">${content}</div>`;
+    document.body.appendChild(overlay);
+    return overlay;
+  }
+
+  function folderForm(data = {}) {
+    return new Promise(resolve => {
+      const overlay = openModal(`
+        <h3>${data.id ? 'Edit Folder' : 'New Folder'}</h3>
+        <input id="pm-f-name" placeholder="Name" value="${data.name || ''}" />
+        <input id="pm-f-desc" placeholder="Description" value="${data.description || ''}" />
+        <input id="pm-f-icon" placeholder="Icon" value="${data.icon || ''}" />
+        <div class="pm-modal-actions">
+          <button id="pm-f-cancel">Cancel</button>
+          <button id="pm-f-save">Save</button>
+        </div>`);
+      overlay.querySelector('#pm-f-cancel').addEventListener('click', () => {
+        overlay.remove();
+        resolve(null);
+      });
+      overlay.querySelector('#pm-f-save').addEventListener('click', () => {
+        const name = overlay.querySelector('#pm-f-name').value.trim();
+        if (!name) return alert('Name required');
+        const description = overlay.querySelector('#pm-f-desc').value.trim();
+        const icon = overlay.querySelector('#pm-f-icon').value.trim();
+        overlay.remove();
+        resolve({ name, description, icon });
+      });
+    });
+  }
+
+  function promptForm(data = {}) {
+    return new Promise(resolve => {
+      const foldersHtml = current.folders.map(f => {
+        const checked = (data.folderIds || []).includes(f.id) ? 'checked' : '';
+        return `<label><input type="checkbox" value="${f.id}" ${checked}/> ${f.name}</label>`;
+      }).join('');
+      const overlay = openModal(`
+        <h3>${data.id ? 'Edit Prompt' : 'New Prompt'}</h3>
+        <input id="pm-p-name" placeholder="Name" value="${data.name || ''}" />
+        <textarea id="pm-p-text" placeholder="Text">${data.text || ''}</textarea>
+        <input id="pm-p-desc" placeholder="Description" value="${data.description || ''}" />
+        <input id="pm-p-tags" placeholder="Tags" value="${(data.tags || []).join(', ')}" />
+        <div class="pm-folder-select">${foldersHtml}</div>
+        <div class="pm-modal-actions">
+          <button id="pm-p-cancel">Cancel</button>
+          <button id="pm-p-save">Save</button>
+        </div>`);
+      overlay.querySelector('#pm-p-cancel').addEventListener('click', () => {
+        overlay.remove();
+        resolve(null);
+      });
+      overlay.querySelector('#pm-p-save').addEventListener('click', () => {
+        const name = overlay.querySelector('#pm-p-name').value.trim();
+        const text = overlay.querySelector('#pm-p-text').value.trim();
+        if (!name || !text) return alert('Name and text required');
+        const description = overlay.querySelector('#pm-p-desc').value.trim();
+        const tags = overlay.querySelector('#pm-p-tags').value
+          .split(',')
+          .map(t => t.trim())
+          .filter(Boolean);
+        const folderIds = Array.from(overlay.querySelectorAll('.pm-folder-select input:checked')).map(i => i.value);
+        overlay.remove();
+        resolve({ name, text, description, tags, folderIds });
+      });
+    });
+  }
+
   // Utilities
   function loadData() {
     return new Promise(resolve => {
       chrome.storage.local.get(['folders', 'prompts'], data => {
-        resolve({
-          folders: data.folders || [],
-          prompts: data.prompts || []
+        const folders = data.folders || [];
+        const prompts = (data.prompts || []).map(p => {
+          if (!p.folderIds) {
+            p.folderIds = p.folderId ? [p.folderId] : [];
+          }
+          return p;
         });
+        resolve({ folders, prompts });
       });
     });
   }
@@ -82,7 +157,15 @@
     folders.slice(0,4).forEach(f => {
       const div = document.createElement('div');
       div.className = 'pm-folder';
-      div.textContent = f.name;
+      div.innerHTML = `<div>${f.icon || '📁'}</div><div>${f.name}</div>`;
+      div.addEventListener('click', async () => {
+        const res = await folderForm(f);
+        if (!res) return;
+        f.name = res.name;
+        f.description = res.description;
+        f.icon = res.icon;
+        saveCurrent();
+      });
       container.appendChild(div);
     });
     if (folders.length > 4) {
@@ -118,19 +201,14 @@
         p.favorite = !p.favorite;
         saveCurrent();
       });
-      card.querySelector('[data-action="edit"]').addEventListener('click', () => {
-        const newName = prompt('Prompt name', p.name);
-        if (!newName) return;
-        const newDesc = prompt('Prompt description', p.description || '');
-        const newText = prompt('Prompt text', p.text);
-        if (!newText) return;
-        const newTags = prompt('Tags (comma separated)', (p.tags || []).join(', ')) || '';
-        const newFolder = prompt('Folder id (leave empty for none)', p.folderId || '') || '';
-        p.name = newName;
-        p.description = newDesc || '';
-        p.text = newText;
-        p.tags = newTags.split(',').map(t => t.trim()).filter(Boolean);
-        p.folderId = newFolder;
+      card.querySelector('[data-action="edit"]').addEventListener('click', async () => {
+        const res = await promptForm(p);
+        if (!res) return;
+        p.name = res.name;
+        p.description = res.description;
+        p.text = res.text;
+        p.tags = res.tags;
+        p.folderIds = res.folderIds;
         saveCurrent();
       });
       card.querySelector('[data-action="del"]').addEventListener('click', () => {
@@ -202,35 +280,25 @@
     }
   });
 
-  document.getElementById('pm-new-folder').addEventListener('click', () => {
-    const name = prompt('Folder name');
-    if (!name) return;
-    const description = prompt('Folder description') || '';
+  document.getElementById('pm-new-folder').addEventListener('click', async () => {
+    const res = await folderForm();
+    if (!res) return;
     const id = Date.now().toString();
-    current.folders.push({ id, name, description });
+    current.folders.push({ id, name: res.name, description: res.description, icon: res.icon });
     saveCurrent();
   });
 
-  document.getElementById('pm-new-prompt').addEventListener('click', () => {
-    const name = prompt('Prompt name');
-    if (!name) return;
-    const description = prompt('Prompt description') || '';
-    const text = prompt('Prompt text');
-    if (!text) return;
-    const tagsInput = prompt('Tags (comma separated)') || '';
-    const folderId = prompt('Folder id (leave empty for none)') || '';
+  document.getElementById('pm-new-prompt').addEventListener('click', async () => {
+    const res = await promptForm();
+    if (!res) return;
     const id = Date.now().toString();
-    const tags = tagsInput
-      .split(',')
-      .map(t => t.trim())
-      .filter(Boolean);
     current.prompts.push({
       id,
-      name,
-      description,
-      text,
-      tags,
-      folderId,
+      name: res.name,
+      description: res.description,
+      text: res.text,
+      tags: res.tags,
+      folderIds: res.folderIds,
       favorite: false
     });
     saveCurrent();
