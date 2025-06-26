@@ -1,22 +1,25 @@
 (function() {
-  function renderFolders(folders, current, saveCurrent) {
+  function renderFolders(folders, current, saveCurrent, selectedIds, toggle) {
     const container = document.getElementById('pm-folders');
     container.innerHTML = '';
-    folders.slice(0,4).forEach(f => {
+    folders.forEach(f => {
       const div = document.createElement('div');
       div.className = 'pm-folder';
+      if (selectedIds && selectedIds.includes(f.id)) div.classList.add('selected');
       div.innerHTML = `
         <div>${f.icon || '📁'}</div>
-        <div>${f.name}</div>`;
-      div.addEventListener('click', () => openFolderForm(f, current, saveCurrent));
+        <div>${f.name}</div>
+        <button class="pm-folder-edit" title="Edit">✎</button>`;
+      div.addEventListener('click', e => {
+        if (e.target.classList.contains('pm-folder-edit')) return;
+        toggle && toggle(f.id);
+      });
+      div.querySelector('.pm-folder-edit').addEventListener('click', e => {
+        e.stopPropagation();
+        openFolderForm(f, current, saveCurrent);
+      });
       container.appendChild(div);
     });
-    if (folders.length > 4) {
-      const more = document.createElement('div');
-      more.className = 'pm-folder';
-      more.textContent = '...';
-      container.appendChild(more);
-    }
   }
 
   function openFolderForm(folder, current, saveCurrent) {
