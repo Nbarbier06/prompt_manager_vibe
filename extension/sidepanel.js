@@ -10,6 +10,53 @@ const fileInput = document.getElementById('fileInput');
 
 let prompts = [];
 
+function escapeCSVField(str = '') {
+  const needsQuotes = /[",\n]/.test(str);
+  const escaped = str.replace(/"/g, '""');
+  return needsQuotes ? `"${escaped}"` : escaped;
+}
+
+function parseCSV(text) {
+  const rows = [];
+  let row = [];
+  let field = '';
+  let insideQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+
+    if (insideQuotes) {
+      if (char === '"') {
+        if (text[i + 1] === '"') {
+          field += '"';
+          i++;
+        } else {
+          insideQuotes = false;
+        }
+      } else {
+        field += char;
+      }
+    } else {
+      if (char === '"') {
+        insideQuotes = true;
+      } else if (char === ',') {
+        row.push(field);
+        field = '';
+      } else if (char === '\n') {
+        row.push(field);
+        rows.push(row);
+        row = [];
+        field = '';
+      } else {
+        field += char;
+      }
+    }
+  }
+  row.push(field);
+  rows.push(row);
+  return rows;
+}
+
 function savePrompts() {
   chrome.storage.local.set({prompts});
 }
@@ -134,9 +181,9 @@ fileInput.addEventListener('change', () => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = () => {
-    const lines = reader.result.split('\n');
-    lines.forEach(line => {
-      const [title, content, folder, tags, favorite] = line.split(',');
+    const rows = parseCSV(reader.result.trim());
+    rows.forEach(cols => {
+      const [title, content, folder, tags, favorite] = cols;
       if (title && content) {
         prompts.push({
           id: Date.now().toString() + Math.random(),
@@ -156,11 +203,11 @@ fileInput.addEventListener('change', () => {
 
 exportBtn.addEventListener('click', () => {
   const lines = prompts.map(p => [
-    p.title,
-    p.content,
-    p.folder || '',
-    (p.tags || []).join(';'),
-    p.favorite
+    escapeCSVField(p.title),
+    escapeCSVField(p.content),
+    escapeCSVField(p.folder || ''),
+    escapeCSVField((p.tags || []).join(';')),
+    escapeCSVField(String(p.favorite))
   ].join(','));
   const blob = new Blob([lines.join('\n')], {type: 'text/csv'});
   const url = URL.createObjectURL(blob);
