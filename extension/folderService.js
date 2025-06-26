@@ -1,22 +1,31 @@
 (function() {
-  function renderFolders(folders, current, saveCurrent) {
+  function renderFolders(
+    folders,
+    current,
+    saveCurrent,
+    selectedIds,
+    onToggle,
+    onEdit,
+    collapsed
+  ) {
     const container = document.getElementById('pm-folders');
     container.innerHTML = '';
-    folders.slice(0,4).forEach(f => {
+    const toRender = collapsed ? folders.slice(0, 3) : folders;
+    toRender.forEach(f => {
       const div = document.createElement('div');
       div.className = 'pm-folder';
+      if (selectedIds.has(f.id)) div.classList.add('selected');
       div.innerHTML = `
         <div>${f.icon || '📁'}</div>
-        <div>${f.name}</div>`;
-      div.addEventListener('click', () => openFolderForm(f, current, saveCurrent));
+        <div>${f.name}</div>
+        <button class="pm-folder-edit" title="Edit">✎</button>`;
+      div.querySelector('.pm-folder-edit').addEventListener('click', e => {
+        e.stopPropagation();
+        onEdit(f);
+      });
+      div.addEventListener('click', () => onToggle(f.id));
       container.appendChild(div);
     });
-    if (folders.length > 4) {
-      const more = document.createElement('div');
-      more.className = 'pm-folder';
-      more.textContent = '...';
-      container.appendChild(more);
-    }
   }
 
   function openFolderForm(folder, current, saveCurrent) {
@@ -37,13 +46,29 @@
           <input type="text" id="pm-folder-icon" value="${f.icon || '📁'}" />
         </div>
         <div class="pm-form-actions">
+          ${folder ? '<button type="button" id="pm-delete-folder">Delete</button>' : ''}
           <button type="submit">Save</button>
           <button type="button" id="pm-cancel-folder">Cancel</button>
         </div>
       </form>
     `);
-    overlay.querySelector('#pm-cancel-folder').onclick = () => overlay.remove();
-    overlay.querySelector('#pm-folder-form').onsubmit = e => {
+  overlay.querySelector('#pm-cancel-folder').onclick = () => overlay.remove();
+  const deleteBtn = overlay.querySelector('#pm-delete-folder');
+  if (deleteBtn) {
+    deleteBtn.onclick = () => {
+      if (confirm('Delete this folder?')) {
+        current.folders = current.folders.filter(f => f !== folder);
+        current.prompts.forEach(p => {
+          if (p.folderIds) {
+            p.folderIds = p.folderIds.filter(id => id !== folder.id);
+          }
+        });
+        saveCurrent();
+        overlay.remove();
+      }
+    };
+  }
+  overlay.querySelector('#pm-folder-form').onsubmit = e => {
       e.preventDefault();
       const name = overlay.querySelector('#pm-folder-name').value.trim();
       if (!name) return;

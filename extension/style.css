@@ -87,21 +87,55 @@
 }
 .pm-actions button:last-child { margin-right: 0; }
 
+.pm-section {
+  border-bottom: 1px solid #555;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+}
+
+#pm-sidebar .pm-section:last-of-type {
+  border-bottom: none;
+}
+
 .pm-folder-list {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 4px;
 }
 
 .pm-folder {
-  width: 60px;
+  flex: 1 0 calc(33.333% - 8px);
   text-align: center;
   cursor: pointer;
   color: #f1f1f1;
   padding: 4px;
   border: 1px solid #555;
   border-radius: 4px;
+  position: relative;
+  transition: box-shadow 0.2s;
+}
+.pm-folder.selected {
+  border-color: #2196f3;
+  box-shadow: 0 0 0 2px #2196f3;
+}
+.pm-folder-edit {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: transparent;
+  border: none;
+  color: #f1f1f1;
+  cursor: pointer;
+  font-size: 0.8em;
+  padding: 0;
+}
+.pm-folder-toggle {
+  display: none;
+  text-align: center;
+  cursor: pointer;
+  color: #f1f1f1;
+  margin-bottom: 12px;
 }
 .pm-folder img {
   width: 24px;
