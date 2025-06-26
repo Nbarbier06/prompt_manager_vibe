@@ -1,4 +1,22 @@
 (function() {
+<<<<<<< dmwoab-codex/séparer-la-sidebar-et-ajouter-filtres
+  function renderFolders(
+    folders,
+    current,
+    saveCurrent,
+    selectedIds,
+    onToggle,
+    onEdit,
+    collapsed
+  ) {
+    const container = document.getElementById('pm-folders');
+    container.innerHTML = '';
+    const toRender = collapsed ? folders.slice(0, 3) : folders;
+    toRender.forEach(f => {
+      const div = document.createElement('div');
+      div.className = 'pm-folder';
+      if (selectedIds.has(f.id)) div.classList.add('selected');
+=======
   function renderFolders(folders, current, saveCurrent, selectedIds, toggle) {
     const container = document.getElementById('pm-folders');
     container.innerHTML = '';
@@ -6,10 +24,18 @@
       const div = document.createElement('div');
       div.className = 'pm-folder';
       if (selectedIds && selectedIds.includes(f.id)) div.classList.add('selected');
+>>>>>>> main
       div.innerHTML = `
         <div>${f.icon || '📁'}</div>
         <div>${f.name}</div>
         <button class="pm-folder-edit" title="Edit">✎</button>`;
+<<<<<<< dmwoab-codex/séparer-la-sidebar-et-ajouter-filtres
+      div.querySelector('.pm-folder-edit').addEventListener('click', e => {
+        e.stopPropagation();
+        onEdit(f);
+      });
+      div.addEventListener('click', () => onToggle(f.id));
+=======
       div.addEventListener('click', e => {
         if (e.target.classList.contains('pm-folder-edit')) return;
         toggle && toggle(f.id);
@@ -18,6 +44,7 @@
         e.stopPropagation();
         openFolderForm(f, current, saveCurrent);
       });
+>>>>>>> main
       container.appendChild(div);
     });
   }
@@ -40,13 +67,29 @@
           <input type="text" id="pm-folder-icon" value="${f.icon || '📁'}" />
         </div>
         <div class="pm-form-actions">
+          ${folder ? '<button type="button" id="pm-delete-folder">Delete</button>' : ''}
           <button type="submit">Save</button>
           <button type="button" id="pm-cancel-folder">Cancel</button>
         </div>
       </form>
     `);
-    overlay.querySelector('#pm-cancel-folder').onclick = () => overlay.remove();
-    overlay.querySelector('#pm-folder-form').onsubmit = e => {
+  overlay.querySelector('#pm-cancel-folder').onclick = () => overlay.remove();
+  const deleteBtn = overlay.querySelector('#pm-delete-folder');
+  if (deleteBtn) {
+    deleteBtn.onclick = () => {
+      if (confirm('Delete this folder?')) {
+        current.folders = current.folders.filter(f => f !== folder);
+        current.prompts.forEach(p => {
+          if (p.folderIds) {
+            p.folderIds = p.folderIds.filter(id => id !== folder.id);
+          }
+        });
+        saveCurrent();
+        overlay.remove();
+      }
+    };
+  }
+  overlay.querySelector('#pm-folder-form').onsubmit = e => {
       e.preventDefault();
       const name = overlay.querySelector('#pm-folder-name').value.trim();
       if (!name) return;

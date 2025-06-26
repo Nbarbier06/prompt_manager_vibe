@@ -23,16 +23,38 @@
       <h1>Prompt Manager</h1>
       <button id="pm-settings-btn" class="pm-settings-icon" aria-label="Settings" title="Settings">⚙</button>
     </div>
-    <input type="text" placeholder="Search" aria-label="Search prompts" class="pm-search" id="pm-search" />
-    <div class="pm-actions">
-      <button id="pm-new-folder">New Folder</button>
-      <button id="pm-new-prompt">New Prompt</button>
+    <div class="pm-section">
+      <input type="text" placeholder="Search" aria-label="Search prompts" class="pm-search" id="pm-search" />
     </div>
-    <div class="pm-folder-list" id="pm-folders"></div>
-    <div class="pm-prompt-list" id="pm-prompts"></div>
+    <div class="pm-section">
+      <div class="pm-actions">
+        <button id="pm-new-folder">New Folder</button>
+        <button id="pm-new-prompt">New Prompt</button>
+      </div>
+      <div class="pm-folder-list" id="pm-folders"></div>
+      <div class="pm-folder-toggle" id="pm-folder-toggle" tabindex="0" aria-label="More folders">▼</div>
+    </div>
+    <div class="pm-section">
+      <div class="pm-prompt-list" id="pm-prompts"></div>
+    </div>
   `;
   document.body.appendChild(sidebar);
   updateTogglePosition();
+
+  const folderToggle = document.getElementById('pm-folder-toggle');
+
+  function toggleFolderList() {
+    foldersCollapsed = !foldersCollapsed;
+    render();
+  }
+
+  folderToggle.addEventListener('click', toggleFolderList);
+  folderToggle.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggleFolderList();
+    }
+  });
 
   function toggleSidebar() {
     sidebar.classList.toggle('open');
@@ -59,7 +81,21 @@
   });
 
   let current = { folders: [], prompts: [] };
+<<<<<<< dmwoab-codex/séparer-la-sidebar-et-ajouter-filtres
+  const selectedFolders = new Set();
+  let foldersCollapsed = true;
+
+  function toggleFolderSelection(id) {
+    if (selectedFolders.has(id)) {
+      selectedFolders.delete(id);
+    } else {
+      selectedFolders.add(id);
+    }
+    render();
+  }
+=======
   let selectedFolders = [];
+>>>>>>> main
 
   function saveCurrent() {
     StorageService.saveData(current.folders, current.prompts);
@@ -82,6 +118,30 @@
       current,
       saveCurrent,
       selectedFolders,
+<<<<<<< dmwoab-codex/séparer-la-sidebar-et-ajouter-filtres
+      toggleFolderSelection,
+      openFolderForm,
+      foldersCollapsed
+    );
+    const toggle = document.getElementById('pm-folder-toggle');
+    if (current.folders.length > 3) {
+      toggle.style.display = 'block';
+      toggle.textContent = foldersCollapsed ? '▼' : '▲';
+    } else {
+      toggle.style.display = 'none';
+    }
+    const term = document.getElementById('pm-search').value.toLowerCase();
+    let filtered = current.prompts.filter(
+      p =>
+        p.name.toLowerCase().includes(term) ||
+        p.text.toLowerCase().includes(term)
+    );
+    if (selectedFolders.size > 0) {
+      filtered = filtered.filter(p =>
+        p.folderIds && p.folderIds.some(id => selectedFolders.has(id))
+      );
+    }
+=======
       toggleFolder
     );
     const term = document.getElementById('pm-search').value.toLowerCase();
@@ -93,6 +153,7 @@
         selectedFolders.some(fid => (p.folderIds || []).includes(fid));
       return matchTerm && inFolder;
     });
+>>>>>>> main
     PromptService.renderPrompts(filtered, current, saveCurrent);
   }
 

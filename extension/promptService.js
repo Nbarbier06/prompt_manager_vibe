@@ -69,13 +69,24 @@
         </div>
         <div class="pm-form-group">${foldersHtml}</div>
         <div class="pm-form-actions">
+          ${prompt ? '<button type="button" id="pm-delete-prompt">Delete</button>' : ''}
           <button type="submit">Save</button>
           <button type="button" id="pm-cancel-prompt">Cancel</button>
         </div>
       </form>
     `);
-    overlay.querySelector('#pm-cancel-prompt').onclick = () => overlay.remove();
-    overlay.querySelector('#pm-prompt-form').onsubmit = e => {
+  overlay.querySelector('#pm-cancel-prompt').onclick = () => overlay.remove();
+  const delBtn = overlay.querySelector('#pm-delete-prompt');
+  if (delBtn) {
+    delBtn.onclick = () => {
+      if (confirm('Delete this prompt?')) {
+        current.prompts = current.prompts.filter(p => p !== prompt);
+        saveCurrent();
+        overlay.remove();
+      }
+    };
+  }
+  overlay.querySelector('#pm-prompt-form').onsubmit = e => {
       e.preventDefault();
       const name = overlay.querySelector('#pm-prompt-name').value.trim();
       if (!name) return;
